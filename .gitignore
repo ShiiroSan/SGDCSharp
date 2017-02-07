@@ -11,16 +11,6 @@
 *.userprefs
 
 # Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-[Xx]64/
-[Xx]86/
-[Bb]uild/
-bld/
-[Bb]in/
-[Oo]bj/
 
 # Visual Studio 2015 cache/options directory
 .vs/
@@ -243,3 +233,10 @@ ModelManifest.xml
 /SGDCSharp/cimgui.dll
 /SGDCSharp/OpenTK.dll
 /.gitignore
+/SGDCSharp/obj/Debug
+/SGDCSharp/bin/Debug/System.Numerics.Vectors.xml
+/SGDCSharp/bin/Debug/System.Numerics.Vectors.dll
+/SGDCSharp/bin/Debug/SGDCSharp.vshost.exe.manifest
+/SGDCSharp/bin/Debug/SGDCSharp.vshost.exe.config
+/SGDCSharp/bin/Debug/SGDCSharp.vshost.exe
+/SGDCSharp/bin/Debug/SGDCSharp.exe.config
