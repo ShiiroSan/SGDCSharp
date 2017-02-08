@@ -9,10 +9,13 @@ For now this program will be **Windows only**.
 ## Futures features ##
 
 ###Planned###
-NB: Version followed by letter *d* or *a* mean that is **only planned for developer version** 
+NB: Version number will be the same as for **developer** and **stable**. Which mean that v0.1 from **stable** will be perfectly like v0.1 from **developer**.
+The only changing things is the access to new stuff. You can see **developer** release like an early access feature which can be laggy/not working as attended.
 
 * v0.1 : Working basic console stuff. In other words, you can get the code. Maybe this will be more or less worked.
-* v0.1a : Multi-(local)-account support.
+* v0.2 : Multi-(local)-account support.
+* v0.3 : Auto-update stuff.
+* v0.4 : Online account syncing.
 * v1.0 : Basic GUI stuff. Maybe ImGUI. Maybe .NET. Who know.
 
 ###Random stuff I wanna add without taking care of specific version###
