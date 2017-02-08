@@ -11,6 +11,12 @@
 *.userprefs
 
 # Build results
+[Xx]64/
+[Xx]86/
+[Bb]uild/
+bld/
+[Bb]in/
+[Oo]bj/
 
 # Visual Studio 2015 cache/options directory
 .vs/
