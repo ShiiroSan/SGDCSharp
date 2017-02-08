@@ -1,0 +1,14 @@
+﻿SteamGuardDesktopv0.1a - Rapport des modifications
+------------------------------------------------------------------
+
+/////////////////////////////////////////
+///Date : 2017/01/24
+///
+///Editor: ShiiroSan
+///
+///+ : Added
+///~ : Changed
+///- : Removed
+/////////////////////////////////////////
+
++ Everything as initial project (just give code for given shared key).

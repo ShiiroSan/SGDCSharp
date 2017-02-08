@@ -11,6 +11,8 @@ namespace SGDCSharp
     {
         static int Main(string[] args)
         {
+            string[,] m_arrMember = new string[25, 5];
+            Console.WriteLine();
             Launcher launcher = new Launcher();
             string sharedSecretKey = launcher.getSharedSecretFromConf();
             if (sharedSecretKey == "error")
