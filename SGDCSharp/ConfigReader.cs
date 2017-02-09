@@ -10,12 +10,10 @@ namespace SGDCSharp
     class ConfigReader
     {
         const string l_sFile = "conf.txt";
-        System.IO.StreamReader fileRead = new System.IO.StreamReader(l_sFile);
-        System.IO.StreamWriter fileWrite = new System.IO.StreamWriter(l_sFile);
-        const byte MAXACCOUNT = 32;
+        //System.IO.StreamReader fileRead = new System.IO.StreamReader(l_sFile);
+        
+        public int g_iFileLine;
         const byte MAXMEMBER = 4;
-        int g_iFileLine;
-
         /* EXEMPLE DE FICHIER CONF
          * 
          * shiirosan:password:sharedsecret
@@ -23,22 +21,46 @@ namespace SGDCSharp
          * 
          */
 
-        ConfigReader()
+        public ConfigReader()
         {
+            if (!File.Exists(l_sFile))
+            {
+                File.Create("conf.txt");
+                this.makeNewAccount();
+            }
             g_iFileLine = File.ReadAllLines(l_sFile).Length;
+        }
+
+        public bool makeNewAccount()
+        {
+
+            string m_szAccUsername="", m_szAccPass="", m_szAccSharedSecret="";
+            Console.Write("Enter your username: ");
+            m_szAccUsername=Console.ReadLine();
+            Console.Write("Enter your password: ");
+            m_szAccPass = Console.ReadLine();
+            Console.Write("Enter your shared_secret key: ");
+            m_szAccSharedSecret = Console.ReadLine();
+            string m_szNewAccount = m_szAccUsername + ":" + m_szAccPass + ":" + m_szAccSharedSecret;
+            //System.IO.StreamWriter tempTW = new System.IO.StreamWriter("conf.txt");
+            //tempTW.WriteLine(m_szNewAccount);
+            this.writeMember(m_szAccUsername, m_szAccPass, m_szAccSharedSecret);
+            //this.writeMember(m_szAccUsername, m_szAccPass, m_szAccSharedSecret);
+            return true;
         }
 
         public string readLine(int line)
         {
-            string[] wholeText = File.ReadAllLines(fileRead.ReadToEnd());
+            string[] wholeText = File.ReadAllLines(l_sFile);
+            Console.WriteLine("[debug] readLine: "+wholeText[line]);
             return wholeText[line];
         }
         public void writeLine(string textToWrite, int line)
         {
             try
             {
-                string[] arrLine = File.ReadAllLines(fileRead.ReadToEnd());
-                arrLine[line - 1] = textToWrite;
+                string[] arrLine = File.ReadAllLines(l_sFile);
+                arrLine[line-1] = textToWrite;
                 File.WriteAllLines(l_sFile, arrLine);
             }
             catch(Exception e)
@@ -55,27 +77,40 @@ namespace SGDCSharp
 
         public string[,] readAllMember() //Tableau contenant: nombre_element, username, password, shared_secret
         {
-            string[,] m_arrMember= new string[MAXACCOUNT, MAXMEMBER];
+            string[,] m_arrMember= new string[g_iFileLine, MAXMEMBER];
             short m_iLine=0;
             string m_szReadedLine;
-            char m_chSeparator = ';';
-            do
+            char m_chSeparator = ':';
+            //Console.WriteLine("[debug] {readAllMember} numberOfLine : "+ g_iFileLine);
+            if (g_iFileLine > 0)
             {
-                m_szReadedLine = this.readLine(m_iLine);
-                for(int i=1; i < MAXMEMBER; i++)
+                do
                 {
-                    m_arrMember[m_iLine, i] = m_szReadedLine.Split(m_chSeparator)[i];
-                }
-                m_iLine++;
-            } while ((m_iLine < MAXACCOUNT) || (m_szReadedLine != null));
+                    m_szReadedLine = this.readLine(m_iLine);
+                    for (int i = 0; i < MAXMEMBER - 1; i++)
+                    {
+                        //Console.WriteLine("[debug] {readAllMember} i pos: " + i);
+                        m_arrMember[m_iLine, i] = m_szReadedLine.Split(m_chSeparator)[i];
+                    }
+                    m_iLine++;
+                } while ((m_iLine < g_iFileLine));
+            }
             return m_arrMember;
         }
 
         public bool writeMember(string username, string password, string shared_secret) //Tableau écris comme suivant username:password:shared_secret
         {
+            /*
             try
             {
-                fileWrite.WriteLine(username + ":" + password + ":" + shared_secret);
+                string[] arrLine = File.ReadAllLines(l_sFile); //We get all line 
+                string[] newArrLine = new string[arrLine.Length + 1]; //doing newArrLine = arrLine is equal to point newArrLine on arrLine which mean that length will be the same for both.
+                for (int i = 0; i < arrLine.Length; i++) // Ofc this is way slow but I don't know how to increment size of pre-allocated array.
+                {
+                    newArrLine[i] = arrLine[i];
+                }
+                newArrLine[arrLine.Length] = username + ":" + password + ":" + shared_secret; //We add our line to the array which contain all previous line
+                File.WriteAllLines(l_sFile, newArrLine); // Then we write everything on our files. Big disk usage...
             }
             catch (IOException e)
             {
@@ -86,7 +121,10 @@ namespace SGDCSharp
                     "part of the file is locked.",
                     e.GetType().Name);
                 return false;
-            }
+            }*/
+            System.IO.StreamWriter tempTW = new System.IO.StreamWriter("conf.txt");
+            tempTW.WriteLine(username + ":" + password + ":" + shared_secret);
+            tempTW.Close();
             g_iFileLine++;
             return true;
         }
@@ -94,7 +132,7 @@ namespace SGDCSharp
         public string[] readUsername()
         {
             string[,] m_arMember = this.readAllMember();
-            string[] m_arUsername=new string[MAXACCOUNT];
+            string[] m_arUsername=new string[g_iFileLine];
             int lineNumber = 0;
             bool m_bExitLoop=false;
             while (!m_bExitLoop) //This is the worst way. Will be kept until found this to shitty.
@@ -137,11 +175,11 @@ namespace SGDCSharp
         public string[] readPassword()
         {
             string[,] m_arMember = this.readAllMember();
-            string[] m_arPassword = new string[MAXACCOUNT];
+            string[] m_arPassword = new string[g_iFileLine];
             byte m_siMaxLineNum = (byte)g_iFileLine;
-            for (int lineNumber = 0; lineNumber >= m_siMaxLineNum; lineNumber++)
+            for (int lineNumber = 0; lineNumber < m_siMaxLineNum; lineNumber++)
             {
-                m_arPassword[lineNumber] = m_arMember[lineNumber, 0];
+                m_arPassword[lineNumber] = m_arMember[lineNumber, 1];
             }
             return m_arPassword;
         }
@@ -155,9 +193,9 @@ namespace SGDCSharp
         public string[] readSharedSecret()
         {
             string[,] m_arMember = this.readAllMember();
-            string[] m_arSharedSecret = new string[MAXACCOUNT];
+            string[] m_arSharedSecret = new string[g_iFileLine];
             byte m_siMaxLineNum = (byte)g_iFileLine;
-            for (int lineNumber = 0; lineNumber >= m_siMaxLineNum; lineNumber++)
+            for (int lineNumber = 0; lineNumber < m_siMaxLineNum; lineNumber++)
             {
                 m_arSharedSecret[lineNumber] = m_arMember[lineNumber, 3];
             }
@@ -168,11 +206,6 @@ namespace SGDCSharp
         {
             string m_szSharedSecret = "NONE";
             return m_szSharedSecret = this.readSharedSecret()[linePos];
-        }
-
-        public string writeUsername()
-        {
-            return "Sup";
         }
     }
 }

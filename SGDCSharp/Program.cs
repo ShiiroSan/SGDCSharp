@@ -11,8 +11,12 @@ namespace SGDCSharp
     {
         static int Main(string[] args)
         {
-
-            
+            ConfigReader user = new ConfigReader();
+            string[] listOfUsername = user.readPassword();
+            for (int i = 0; i < listOfUsername.Length; i++)
+            {
+                Console.WriteLine("bump "+listOfUsername[i]);
+            }
             Console.ReadKey();
             return 0;
             Console.WriteLine();
