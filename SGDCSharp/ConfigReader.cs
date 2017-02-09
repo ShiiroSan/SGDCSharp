@@ -14,12 +14,20 @@ namespace SGDCSharp
         System.IO.StreamWriter fileWrite = new System.IO.StreamWriter(l_sFile);
         const byte MAXACCOUNT = 32;
         const byte MAXMEMBER = 4;
+        int g_iFileLine;
+
         /* EXEMPLE DE FICHIER CONF
          * 
          * shiirosan:password:sharedsecret
          * unnamed:sonpass:sonsharedsecret
          * 
          */
+
+        ConfigReader()
+        {
+            g_iFileLine = File.ReadAllLines(l_sFile).Length;
+        }
+
         public string readLine(int line)
         {
             string[] wholeText = File.ReadAllLines(fileRead.ReadToEnd());
@@ -79,6 +87,7 @@ namespace SGDCSharp
                     e.GetType().Name);
                 return false;
             }
+            g_iFileLine++;
             return true;
         }
 
@@ -86,15 +95,28 @@ namespace SGDCSharp
         {
             string[,] m_arMember = this.readAllMember();
             string[] m_arUsername=new string[MAXACCOUNT];
-            int m_iArMemberLength = m_arMember.Length;
-            do
+            int lineNumber = 0;
+            bool m_bExitLoop=false;
+            while (!m_bExitLoop) //This is the worst way. Will be kept until found this to shitty.
             {
-
-            } while ();
-            for(int lineNumber = 0; lineNumber >= m_iArMemberLength; lineNumber++)
+                try
+                {
+                    int m_iForceException = m_arMember[lineNumber, 0].Length;
+                    m_arUsername[lineNumber] = m_arMember[lineNumber, 0];
+                }
+                catch (Exception)
+                {
+                    m_bExitLoop = true;
+                }
+                lineNumber++;
+            }
+            //byte m_siMaxLineNum = (byte)File.ReadAllLines(fileRead.ReadToEnd()).Length; /* Just another way to get max numerous username. Linked to the for-condition */
+            /*for(int lineNumber = 0; lineNumber >= m_siMaxLinNum; lineNumber++) 
+             //Read line by line to get all the username and write them on m_arUsername.
+             //This way you take also blank username but it would allow line feed.
             {
                 m_arUsername[lineNumber] = m_arMember[lineNumber, 0];
-            }
+            }*/
             return m_arUsername;
         }
 
@@ -104,16 +126,24 @@ namespace SGDCSharp
             return m_szUsername = this.readUsername()[linePos];
         }
 
+        public int findUsername(string m_szSearchedUsername) //For obvious reason, no findPassword. This would mean you'll need to decrypt password, compare then re-encrypt. 
+        {
+            int m_iLineWhereFound = -1; 
+
+            return m_iLineWhereFound; //if -1, line isn't found ofc
+        }
+
+
         public string[] readPassword()
         {
             string[,] m_arMember = this.readAllMember();
-            string[] m_arUsername = new string[MAXACCOUNT];
-            int m_iArMemberLength = m_arMember.Length;
-            for (int lineNumber = 0; lineNumber >= m_iArMemberLength; lineNumber++)
+            string[] m_arPassword = new string[MAXACCOUNT];
+            byte m_siMaxLineNum = (byte)g_iFileLine;
+            for (int lineNumber = 0; lineNumber >= m_siMaxLineNum; lineNumber++)
             {
-                m_arUsername[lineNumber] = m_arMember[lineNumber, 0];
+                m_arPassword[lineNumber] = m_arMember[lineNumber, 0];
             }
-            return m_arUsername;
+            return m_arPassword;
         }
 
         public string readSpecificPassword(int linePos)
@@ -125,13 +155,13 @@ namespace SGDCSharp
         public string[] readSharedSecret()
         {
             string[,] m_arMember = this.readAllMember();
-            string[] m_arUsername = new string[MAXACCOUNT];
-            int m_iArMemberLength = m_arMember.Length;
-            for (int lineNumber = 0; lineNumber >= m_iArMemberLength; lineNumber++)
+            string[] m_arSharedSecret = new string[MAXACCOUNT];
+            byte m_siMaxLineNum = (byte)g_iFileLine;
+            for (int lineNumber = 0; lineNumber >= m_siMaxLineNum; lineNumber++)
             {
-                m_arUsername[lineNumber] = m_arMember[lineNumber, 0];
+                m_arSharedSecret[lineNumber] = m_arMember[lineNumber, 3];
             }
-            return m_arUsername;
+            return m_arSharedSecret;
         }
 
         public string readSpecificSharedSecret(int linePos)
