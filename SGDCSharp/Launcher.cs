@@ -10,45 +10,82 @@ namespace SGDCSharp
     class Launcher
     {
         const bool _CONNECTED = true;
-        public string getSharedSecretFromConf()
+        UserConf userConfig = new UserConf();
+        public Launcher()
         {
-            if (File.Exists("./conf.txt"))
-            {
-                System.IO.StreamReader file = new System.IO.StreamReader("conf.txt");
-                string sharedSecretKey = file.ReadLine().ToString();
-                return sharedSecretKey; 
-            }
-            else
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("The file conf.txt doesn't exist. You should create one and paste the shared_key value.");
-                Console.WriteLine("You can contact the dev here for help : eaudrey96@gmail.com");
-                Console.ReadKey();
-                Console.ResetColor();
-                return "error";
-            }
+
         }
-        private bool createLocalAccount()
+
+        public void mainMenu()
         {
-            bool error = false;
-            string m_sUsername="", m_sPassword="";
-            Console.Write("Desired username: ");
-            m_sUsername=Console.ReadLine();
-            if (m_sUsername == "")
+
+        }
+
+        public void localAccountMenu()
+        {
+            Console.WriteLine("[1] Add a new account");
+            Console.WriteLine("[2] Import a new account");
+            Console.WriteLine("[3] Connect to an account");
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine("[0] Back");
+            switch (Console.ReadKey().Key)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("You cannot use blank username!");
-                Console.ResetColor();
+                case ConsoleKey.Enter:
+                    break;
+                case ConsoleKey.Escape:
+                    break;
+                case ConsoleKey.Spacebar:
+                    break;
+                case ConsoleKey.NumPad0:
+                    break;
+                case ConsoleKey.NumPad1:
+                    break;
+                case ConsoleKey.NumPad2:
+                    break;
+                case ConsoleKey.NumPad3:
+                    break;
+                case ConsoleKey.NumPad4:
+                    break;
+                case ConsoleKey.NumPad5:
+                    break;
+                case ConsoleKey.NumPad6:
+                    break;
+                case ConsoleKey.NumPad7:
+                    break;
+                case ConsoleKey.NumPad8:
+                    break;
+                case ConsoleKey.NumPad9:
+                    break;
+                case ConsoleKey.Oem1:
+                    break;
+                case ConsoleKey.OemPlus:
+                    break;
+                case ConsoleKey.OemComma:
+                    break;
+                case ConsoleKey.OemMinus:
+                    break;
+                case ConsoleKey.OemPeriod:
+                    break;
+                case ConsoleKey.Oem2:
+                    break;
+                case ConsoleKey.Oem3:
+                    break;
+                case ConsoleKey.Oem4:
+                    break;
+                case ConsoleKey.Oem5:
+                    break;
+                case ConsoleKey.Oem6:
+                    break;
+                case ConsoleKey.Oem7:
+                    break;
+                case ConsoleKey.Oem8:
+                    break;
+                case ConsoleKey.Oem102:
+                    break;
+                default:
+                    break;
             }
-            Console.Write("Desired password: ");
-            m_sPassword= Console.ReadLine();
-            if (m_sPassword == "")
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Are you sure you don't want to use password? This is big security issue.");
-                Console.ResetColor();
-            }
-                return !error;
         }
 
         private bool connectToLocalAccount()

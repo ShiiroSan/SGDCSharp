@@ -12,3 +12,4 @@
 /////////////////////////////////////////
 
 + Everything as initial project (just give code for given shared key).
++ Implemented [working] everything for local account management. 

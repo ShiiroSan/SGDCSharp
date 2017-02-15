@@ -7,7 +7,7 @@ using System.IO;
 
 namespace SGDCSharp
 {
-    class ConfigReader
+    class UserConf
     {
         const string l_sFile = "conf.txt";
         //System.IO.StreamReader fileRead = new System.IO.StreamReader(l_sFile);
@@ -21,7 +21,7 @@ namespace SGDCSharp
          * 
          */
 
-        public ConfigReader()
+        public UserConf()
         {
             if (!File.Exists(l_sFile))
             {
@@ -31,21 +31,70 @@ namespace SGDCSharp
             g_iFileLine = File.ReadAllLines(l_sFile).Length;
         }
 
+        public string Between(string STR, string FirstString, string LastString)
+        {
+            string FinalString;
+            int Pos1 = STR.IndexOf(FirstString) + FirstString.Length;
+            int Pos2 = STR.IndexOf(LastString);
+            FinalString = STR.Substring(Pos1, Pos2 - Pos1);
+            return FinalString;
+        }
+
         public bool makeNewAccount()
         {
 
             string m_szAccUsername="", m_szAccPass="", m_szAccSharedSecret="";
             Console.Write("Enter your username: ");
             m_szAccUsername=Console.ReadLine();
+            if (m_szAccUsername=="")
+            {
+                while (m_szAccUsername=="")
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("You should enter an username!");
+                    Console.ResetColor();
+                    Console.Write("Enter your username: ");
+                    m_szAccUsername = Console.ReadLine();
+                }
+            }
             Console.Write("Enter your password: ");
             m_szAccPass = Console.ReadLine();
+            if (m_szAccPass == "")
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Using a password is required to limit access to your steamguard code.");
+                Console.ResetColor();
+                Console.Write("Are you sure you won't use a password? (Y/n)");
+
+                ConsoleKey m_chNoPassVerif=Console.ReadKey().Key;
+                if ((m_chNoPassVerif.ToString() == "Y") || (m_chNoPassVerif.ToString() == "Enter"))
+                {
+                    m_szAccPass = "0";
+                }
+                else
+                {
+                    do
+                    {
+                        Console.Write("Enter your password: ");
+                        m_szAccPass = Console.ReadLine();
+                    } while (m_szAccPass=="");
+                }
+             }
             Console.Write("Enter your shared_secret key: ");
             m_szAccSharedSecret = Console.ReadLine();
+            if (m_szAccSharedSecret == "")
+            {
+                while (m_szAccSharedSecret == "")
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("You should enter your shared_secret key!");
+                    Console.ResetColor();
+                    Console.Write("Enter your shared_secret key: ");
+                    m_szAccSharedSecret = Console.ReadLine();
+                }
+            }
             string m_szNewAccount = m_szAccUsername + ":" + m_szAccPass + ":" + m_szAccSharedSecret;
-            //System.IO.StreamWriter tempTW = new System.IO.StreamWriter("conf.txt");
-            //tempTW.WriteLine(m_szNewAccount);
-            this.writeMember(m_szAccUsername, m_szAccPass, m_szAccSharedSecret);
-            //this.writeMember(m_szAccUsername, m_szAccPass, m_szAccSharedSecret);
+            this.writeMember(m_szNewAccount);
             return true;
         }
 
@@ -98,35 +147,20 @@ namespace SGDCSharp
             return m_arrMember;
         }
 
-        public bool writeMember(string username, string password, string shared_secret) //Tableau écris comme suivant username:password:shared_secret
+        private bool writeMember(string username, string password, string shared_secret) //Tableau écris comme suivant username:password:shared_secret
         {
-            /*
-            try
-            {
-                string[] arrLine = File.ReadAllLines(l_sFile); //We get all line 
-                string[] newArrLine = new string[arrLine.Length + 1]; //doing newArrLine = arrLine is equal to point newArrLine on arrLine which mean that length will be the same for both.
-                for (int i = 0; i < arrLine.Length; i++) // Ofc this is way slow but I don't know how to increment size of pre-allocated array.
-                {
-                    newArrLine[i] = arrLine[i];
-                }
-                newArrLine[arrLine.Length] = username + ":" + password + ":" + shared_secret; //We add our line to the array which contain all previous line
-                File.WriteAllLines(l_sFile, newArrLine); // Then we write everything on our files. Big disk usage...
-            }
-            catch (IOException e)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(
-                    "{0}: The write operation could not " +
-                    "be performed because the specified " +
-                    "part of the file is locked.",
-                    e.GetType().Name);
-                return false;
-            }*/
-            System.IO.StreamWriter tempTW = new System.IO.StreamWriter("conf.txt");
-            tempTW.WriteLine(username + ":" + password + ":" + shared_secret);
-            tempTW.Close();
+            using (StreamWriter tempTW = File.AppendText(l_sFile))
+                tempTW.WriteLine(username + ":" + password + ":" + shared_secret);
             g_iFileLine++;
             return true;
+        }
+
+        private bool writeMember(string m_szNewMember) //Tableau écris comme suivant username:password:shared_secret
+        {
+                using (StreamWriter tempTW = File.AppendText(l_sFile))
+                    tempTW.WriteLine(m_szNewMember);
+                g_iFileLine++;
+                return true;
         }
 
         public string[] readUsername()
@@ -158,7 +192,7 @@ namespace SGDCSharp
             return m_arUsername;
         }
 
-        public string readSpecificUsername(int linePos)
+        public string readSpecificUsername(int linePos) //Si la valeur retourné est NONE alors le nom d'utilisateur ne peut-être trouvé.
         {
             string m_szUsername="NONE";
             return m_szUsername = this.readUsername()[linePos];
@@ -166,8 +200,22 @@ namespace SGDCSharp
 
         public int findUsername(string m_szSearchedUsername) //For obvious reason, no findPassword. This would mean you'll need to decrypt password, compare then re-encrypt. 
         {
-            int m_iLineWhereFound = -1; 
-
+            int m_iLineWhereFound = -1, i=0;
+            byte m_siMaxUsername=(byte)g_iFileLine;
+            string[] m_arrUsernameList = this.readUsername();
+            try
+            {
+                while (m_szSearchedUsername.ToLower() != m_arrUsernameList[i].ToLower())
+                {
+                    i++;
+                }
+                m_iLineWhereFound = i;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return m_iLineWhereFound; //if -1, line isn't found ofc   
+            }
             return m_iLineWhereFound; //if -1, line isn't found ofc
         }
 
@@ -197,7 +245,7 @@ namespace SGDCSharp
             byte m_siMaxLineNum = (byte)g_iFileLine;
             for (int lineNumber = 0; lineNumber < m_siMaxLineNum; lineNumber++)
             {
-                m_arSharedSecret[lineNumber] = m_arMember[lineNumber, 3];
+                m_arSharedSecret[lineNumber] = m_arMember[lineNumber, 2];
             }
             return m_arSharedSecret;
         }
@@ -206,6 +254,53 @@ namespace SGDCSharp
         {
             string m_szSharedSecret = "NONE";
             return m_szSharedSecret = this.readSharedSecret()[linePos];
+        }
+
+        public bool importSteamConfToNewAccount(string m_szPlaceOfFile)
+        {
+            bool m_bNoError = true;
+            try
+            {
+                string m_szContentOfSGFile = File.ReadAllText(m_szPlaceOfFile);
+                string m_szAccountName = this.Between(m_szContentOfSGFile, "\"account_name\":\"", "\",\"token_gid");
+                string m_szSharedSecret = this.Between(m_szContentOfSGFile, "\"shared_secret\":\"", "\",\"serial_number");
+                Console.WriteLine(m_szSharedSecret);
+                Console.Write("Enter your password: ");
+                string m_szPassword = Console.ReadLine();
+                if (m_szPassword == "")
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("Using a password is required to limit access to your steamguard code.");
+                    Console.ResetColor();
+                    Console.Write("Are you sure you won't use a password? (Y/n)");
+
+                    ConsoleKey m_chNoPassVerif = Console.ReadKey().Key;
+                    if ((m_chNoPassVerif.ToString() == "Y") || (m_chNoPassVerif.ToString() == "Enter"))
+                    {
+                        m_szPassword = "0";
+                    }
+                    else
+                    {
+                        do
+                        {
+                            Console.Write("Enter your password: ");
+                            m_szPassword = Console.ReadLine();
+                        } while (m_szPassword == "");
+                    }
+                }
+                this.writeMember(m_szAccountName, m_szPassword, m_szSharedSecret);
+                Console.Write("User ");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write(m_szAccountName);
+                Console.ResetColor();
+                Console.WriteLine(" has been added to the list of account.");
+            }
+            catch (Exception)
+            {
+                m_bNoError = false;
+                Console.WriteLine("error happened!");
+            }
+            return m_bNoError;
         }
     }
 }

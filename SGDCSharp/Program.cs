@@ -11,19 +11,12 @@ namespace SGDCSharp
     {
         static int Main(string[] args)
         {
-            ConfigReader user = new ConfigReader();
-            string[] listOfUsername = user.readPassword();
-            for (int i = 0; i < listOfUsername.Length; i++)
-            {
-                Console.WriteLine("bump "+listOfUsername[i]);
-            }
-            Console.ReadKey();
-            return 0;
-            Console.WriteLine();
+            UserConf user = new UserConf();
             Launcher launcher = new Launcher();
-            string sharedSecretKey = launcher.getSharedSecretFromConf();
+            string sharedSecretKey = user.readSpecificSharedSecret(user.findUsername("johnpaullamby2k"));
             if (sharedSecretKey == "error")
                 return 0;
+            Console.Clear();
             Console.SetWindowSize(20, 32);
             byte[] mSecret = Convert.FromBase64String(sharedSecretKey);
             if (mSecret == null)
